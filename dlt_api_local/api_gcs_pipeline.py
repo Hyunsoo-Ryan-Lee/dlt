@@ -1,0 +1,37 @@
+import dlt, requests
+import pandas as pd
+from dlt.sources.filesystem import filesystem
+
+
+def get_customer_data(url: str) -> pd.DataFrame:
+    """API로부터 고객 데이터를 가져오는 함수"""
+    response = requests.get(url)
+    df = pd.json_normalize(response.json())
+    return df
+
+def load_to_s3(data: pd.DataFrame, **kwargs):
+    """데이터를 S3에 적재하는 함수"""
+    pipeline = dlt.pipeline(
+        pipeline_name=kwargs["pipeline_name"],
+        destination="filesystem", 
+        dataset_name=kwargs["dataset_name"]
+    )
+    return pipeline
+
+if __name__ == "__main__":
+    # API URL 설정
+    API_URL = "https://jaffle-shop.scalevector.ai/api/v1/customers"
+    
+    # 데이터 가져오기
+    customer_df = get_customer_data(API_URL)
+    
+    # S3에 데이터 적재
+    pipeline = load_to_s3(
+        data=customer_df,
+        pipeline_name="api_gcs_pipeline",
+        dataset_name="customer_data"
+        )
+    
+    pipeline.run(data=customer_df, table_name="customers")
+    
+    print("파이프라인 실행 결과:", pipeline)
