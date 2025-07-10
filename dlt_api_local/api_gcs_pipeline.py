@@ -1,6 +1,5 @@
 import dlt, requests
 import pandas as pd
-from dlt.sources.filesystem import filesystem
 
 
 def get_customer_data(url: str) -> pd.DataFrame:
@@ -9,7 +8,7 @@ def get_customer_data(url: str) -> pd.DataFrame:
     df = pd.json_normalize(response.json())
     return df
 
-def load_to_s3(data: pd.DataFrame, **kwargs):
+def load_to_gcs(data: pd.DataFrame, **kwargs):
     """데이터를 S3에 적재하는 함수"""
     pipeline = dlt.pipeline(
         pipeline_name=kwargs["pipeline_name"],
@@ -26,7 +25,7 @@ if __name__ == "__main__":
     customer_df = get_customer_data(API_URL)
     
     # S3에 데이터 적재
-    pipeline = load_to_s3(
+    pipeline = load_to_gcs(
         data=customer_df,
         pipeline_name="api_gcs_pipeline",
         dataset_name="customer_data"

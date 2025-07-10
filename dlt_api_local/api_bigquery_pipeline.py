@@ -16,19 +16,20 @@ def load_to_bigquery(data: pd.DataFrame, **kwargs):
     )
     return pipeline
 
-# API URL 설정
-API_URL = "https://jaffle-shop.scalevector.ai/api/v1/customers"
+if __name__ == "__main__":
+    # API URL 설정
+    API_URL = "https://jaffle-shop.scalevector.ai/api/v1/customers"
 
-# 데이터 가져오기
-customer_df = get_customer_data(API_URL)
+    # 데이터 가져오기
+    customer_df = get_customer_data(API_URL)
 
-# BigQuery에 데이터 적재
-pipeline = load_to_bigquery(
-    data=customer_df,
-    pipeline_name="api_bq_pipeline",
-    dataset_name="bq_dlt"
-)
+    # BigQuery에 데이터 적재
+    pipeline = load_to_bigquery(
+        data=customer_df,
+        pipeline_name="api_bq_pipeline",
+        dataset_name="bq_dlt"
+    )
 
-result = pipeline.run(data=customer_df, table_name="customers")
+    result = pipeline.run(data=customer_df, table_name="customers")
 
-print("BigQuery 파이프라인 실행 결과:", result)
+    print("BigQuery 파이프라인 실행 결과:", result)
